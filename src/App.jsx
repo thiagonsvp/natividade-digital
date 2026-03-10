@@ -40,11 +40,11 @@ function Badge({s,C}){
 function Stat({label,value,sub,color,C}){
   return <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:"16px 20px",flex:1,minWidth:150,boxShadow:C.shadow}}>
     <div style={{fontSize:11,color:C.muted,fontWeight:600,marginBottom:6,textTransform:"uppercase",letterSpacing:1}}>{label}</div>
-    <div style={{fontSize:24,fontFamily:"Syne",fontWeight:800,color:color||C.accent}}>{value}</div>
+    <div style={{fontSize:24,fontFamily:"Poppins",fontWeight:800,color:color||C.accent}}>{value}</div>
     {sub&&<div style={{fontSize:11,color:C.muted,marginTop:3}}>{sub}</div>}
   </div>;
 }
-const iS=(C,ex={})=>({width:"100%",background:C.inputBg,border:`1px solid ${C.border}`,borderRadius:8,padding:"9px 12px",color:C.strong,fontSize:13,outline:"none",fontFamily:"DM Sans,sans-serif",boxSizing:"border-box",...ex});
+const iS=(C,ex={})=>({width:"100%",background:C.inputBg,border:`1px solid ${C.border}`,borderRadius:8,padding:"9px 12px",color:C.strong,fontSize:13,outline:"none",fontFamily:"Inter,sans-serif",boxSizing:"border-box",...ex});
 function Inp({value,onChange,placeholder,type="text",min,max,C}){return <input type={type} value={value||""} min={min} max={max} onChange={e=>onChange(e.target.value)} placeholder={placeholder} style={iS(C)}/>;}
 function Sel({value,onChange,options,C}){return <select value={value||""} onChange={e=>onChange(e.target.value)} style={iS(C)}>{options.map(o=><option key={o} value={o}>{o}</option>)}</select>;}
 function FRow({label,children,C}){return <div style={{marginBottom:11}}><label style={{fontSize:10,color:C.muted,display:"block",marginBottom:3,textTransform:"uppercase",letterSpacing:.7,fontWeight:700}}>{label}</label>{children}</div>;}
@@ -52,14 +52,14 @@ function Btn({children,onClick,C,sm,ghost,danger,disabled,full}){
   const bg=ghost?(danger?C.danger+"18":"transparent"):danger?C.danger:C.accent;
   const col=ghost?(danger?C.danger:C.muted):"#fff";
   const brd=ghost?`1px solid ${danger?C.danger+"55":C.border}`:"none";
-  return <button onClick={onClick} disabled={disabled} style={{background:bg,color:col,border:brd,borderRadius:sm?7:9,padding:sm?"5px 12px":"9px 18px",fontWeight:600,cursor:disabled?"not-allowed":"pointer",fontSize:sm?12:13.5,opacity:disabled?.4:1,fontFamily:"DM Sans",whiteSpace:"nowrap",width:full?"100%":"auto"}}>{children}</button>;
+  return <button onClick={onClick} disabled={disabled} style={{background:bg,color:col,border:brd,borderRadius:sm?7:9,padding:sm?"5px 12px":"9px 18px",fontWeight:600,cursor:disabled?"not-allowed":"pointer",fontSize:sm?12:13.5,opacity:disabled?.4:1,fontFamily:"Inter,sans-serif",whiteSpace:"nowrap",width:full?"100%":"auto"}}>{children}</button>;
 }
 function Modal({title,onClose,children,C,wide,xlarge}){
   const w=xlarge?720:wide?560:440;
   return <div style={{position:"fixed",inset:0,background:"#00000090",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:12}} onClick={onClose}>
     <div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:20,padding:24,width:w,maxWidth:"97vw",maxHeight:"92vh",overflowY:"auto",boxShadow:C.shadow}} onClick={e=>e.stopPropagation()}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
-        <h3 style={{fontFamily:"Syne",fontWeight:800,fontSize:16,color:C.strong}}>{title}</h3>
+        <h3 style={{fontFamily:"Poppins",fontWeight:800,fontSize:16,color:C.strong}}>{title}</h3>
         <button onClick={onClose} style={{background:C.border,border:"none",color:C.muted,cursor:"pointer",borderRadius:6,width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12}}>✕</button>
       </div>
       {children}
@@ -91,7 +91,7 @@ function Confetti({onDone}){
   const items=Array.from({length:28},(_,i)=>({id:i,e:["🎉","🎊","✨","⭐","💰","🏆","🥳"][i%7],l:2+Math.random()*96,dl:Math.random()*.8,dur:1.5+Math.random()}));
   return <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:1000,overflow:"hidden"}}>{items.map(it=><div key={it.id} style={{position:"absolute",left:`${it.l}%`,top:-30,fontSize:22,animation:`cfDrop ${it.dur}s ${it.dl}s ease-in forwards`}}>{it.e}</div>)}</div>;
 }
-function Spinner({C}){return <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",background:C.bg,flexDirection:"column",gap:14}}><div style={{width:36,height:36,border:`3px solid ${C.accent}`,borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite"}}/><div style={{color:C.accent,fontFamily:"Syne",fontWeight:700,fontSize:13}}>Carregando...</div></div>;}
+function Spinner({C}){return <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",background:C.bg,flexDirection:"column",gap:14}}><div style={{width:36,height:36,border:`3px solid ${C.accent}`,borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite"}}/><div style={{color:C.accent,fontFamily:"Poppins",fontWeight:700,fontSize:13}}>Carregando...</div></div>;}
 
 // ── Login ────────────────────────────────────────────────
 function Login({onLogin,theme,toggleTheme,C}){
@@ -107,14 +107,14 @@ function Login({onLogin,theme,toggleTheme,C}){
     if(error||!data){setErr("E-mail ou senha incorretos.");return;}
     onLogin(data);
   }
-  return <div style={{minHeight:"100vh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"DM Sans,sans-serif",padding:"20px"}}>
+  return <div style={{minHeight:"100vh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"Inter,sans-serif",padding:"20px"}}>
     <div style={{width:"100%",maxWidth:420,padding:"40px 20px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:24,boxShadow:C.shadow}}>
       <div style={{textAlign:"center",marginBottom:32}}>
         <div style={{width:52,height:52,borderRadius:14,background:"#6c63ff22",border:"2px solid #6c63ff44",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" strokeWidth="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
         </div>
-        <div style={{fontFamily:"Syne",fontWeight:800,fontSize:22,color:C.strong}}>Natividade</div>
-        <div style={{fontFamily:"Syne",fontWeight:700,fontSize:11,color:"#6c63ff",letterSpacing:2,marginTop:2}}>DIGITAL</div>
+        <div style={{fontFamily:"Poppins",fontWeight:800,fontSize:22,color:C.strong}}>Natividade</div>
+        <div style={{fontFamily:"Poppins",fontWeight:700,fontSize:11,color:"#6c63ff",letterSpacing:2,marginTop:2}}>DIGITAL</div>
         <div style={{color:C.muted,fontSize:13,marginTop:10}}>Acesse o sistema</div>
       </div>
       {err&&<div style={{background:C.danger+"18",border:`1px solid ${C.danger}44`,color:C.danger,borderRadius:9,padding:"10px 14px",fontSize:13,marginBottom:16,textAlign:"center"}}>{err}</div>}
@@ -124,10 +124,10 @@ function Login({onLogin,theme,toggleTheme,C}){
           <button onClick={()=>setShow(s=>!s)} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:13}}>{show?"🙈":"👁"}</button></div>
       </FRow>
       <div style={{marginTop:6,marginBottom:20}}/>
-      <button onClick={attempt} disabled={loading} style={{width:"100%",background:C.accent,color:"#fff",border:"none",borderRadius:10,padding:"12px",fontWeight:700,cursor:"pointer",fontSize:15,fontFamily:"Syne",opacity:loading?.6:1}}>
+      <button onClick={attempt} disabled={loading} style={{width:"100%",background:C.accent,color:"#fff",border:"none",borderRadius:10,padding:"12px",fontWeight:700,cursor:"pointer",fontSize:15,fontFamily:"Poppins",opacity:loading?.6:1}}>
         {loading?"Entrando...":"Entrar"}
       </button>
-      <div style={{textAlign:"center",marginTop:20}}><button onClick={toggleTheme} style={{background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:12,fontFamily:"DM Sans"}}>{theme==="dark"?"☀️ Modo Claro":"🌙 Modo Escuro"}</button></div>
+      <div style={{textAlign:"center",marginTop:20}}><button onClick={toggleTheme} style={{background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:12,fontFamily:"Inter,sans-serif"}}>{theme==="dark"?"☀️ Modo Claro":"🌙 Modo Escuro"}</button></div>
     </div>
   </div>;
 }
@@ -180,7 +180,7 @@ function Dashboard({clients,tasks,history,rec,pay,C}){
   };
   
   return <div>
-    <h1 style={{fontFamily:"Syne",fontSize:26,fontWeight:800,color:C.strong,marginBottom:4}}>Dashboard</h1>
+    <h1 style={{fontFamily:"Poppins",fontSize:26,fontWeight:800,color:C.strong,marginBottom:4}}>Dashboard</h1>
     <p style={{color:C.muted,fontSize:13,marginBottom:22}}>{new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</p>
     <div style={{display:"flex",gap:14,flexWrap:"wrap",marginBottom:22}}>
       <Stat C={C} label="MRR" value={`R$ ${mrr.toLocaleString()}`} color={C.accent}/>
@@ -189,14 +189,14 @@ function Dashboard({clients,tasks,history,rec,pay,C}){
       <Stat C={C} label="Contas a Pagar" value={`R$ ${pendPay.toLocaleString()}`} color={C.warning}/>
     </div>
     <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:20,marginBottom:22,boxShadow:C.shadow}}>
-      <h3 style={{fontFamily:"Syne",fontWeight:700,fontSize:15,marginBottom:14,color:C.strong}}>Receita vs Despesa (últimos 12 meses)</h3>
+      <h3 style={{fontFamily:"Poppins",fontWeight:700,fontSize:15,marginBottom:14,color:C.strong}}>Receita vs Despesa (últimos 12 meses)</h3>
       <div style={{height:300}}>
         <Bar data={chartData} options={{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}},scales:{y:{beginAtZero:true}}}} />
       </div>
     </div>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:18}}>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:20,boxShadow:C.shadow}}>
-        <h3 style={{fontFamily:"Syne",fontWeight:700,fontSize:15,marginBottom:14,color:C.strong}}>Tarefas Pendentes</h3>
+        <h3 style={{fontFamily:"Poppins",fontWeight:700,fontSize:15,marginBottom:14,color:C.strong}}>Tarefas Pendentes</h3>
         {tasks.filter(t=>!t.done).slice(0,5).map(t=>{const d=daysTo(t.due);return <div key={t.id} style={{display:"flex",alignItems:"center",gap:9,padding:"9px 0",borderBottom:`1px solid ${C.border}`}}>
           <div style={{width:6,height:6,borderRadius:"50%",background:t.priority==="Alta"?C.danger:C.warning,flexShrink:0}}/>
           <div style={{flex:1}}><div style={{fontSize:13,fontWeight:500,color:C.strong}}>{t.title}</div><div style={{fontSize:11,color:C.muted,marginTop:1}}>{t.client}</div></div>
@@ -205,7 +205,7 @@ function Dashboard({clients,tasks,history,rec,pay,C}){
         {!tasks.filter(t=>!t.done).length&&<p style={{color:C.muted,fontSize:13}}>Sem pendências 🎉</p>}
       </div>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:20,boxShadow:C.shadow}}>
-        <h3 style={{fontFamily:"Syne",fontWeight:700,fontSize:15,marginBottom:14,color:C.strong}}>Últimos Atendimentos</h3>
+        <h3 style={{fontFamily:"Poppins",fontWeight:700,fontSize:15,marginBottom:14,color:C.strong}}>Últimos Atendimentos</h3>
         {history.slice(0,4).map(h=><div key={h.id} style={{padding:"9px 0",borderBottom:`1px solid ${C.border}`}}>
           <div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}><span style={{fontSize:13,fontWeight:600,color:C.strong}}>{h.client}</span><span style={{fontSize:11,color:C.muted}}>{fmt(h.date)}</span></div>
           <div style={{fontSize:11,color:C.muted}}>{h.type} · {h.user_name} — {h.note?.slice(0,55)}...</div>
@@ -269,8 +269,8 @@ function Clientes({clients,setClients,history,plans,setPlans,setRec,C}){
     <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:18}}>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:22,boxShadow:C.shadow}}>
         <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:20}}>
-          <div style={{width:48,height:48,borderRadius:12,background:C.accentDim,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"Syne",fontWeight:800,fontSize:18,color:C.accent,flexShrink:0}}>{sel.name[0]}</div>
-          <div style={{flex:1}}><h2 style={{fontFamily:"Syne",fontWeight:800,fontSize:20,color:C.strong}}>{sel.name}</h2>
+          <div style={{width:48,height:48,borderRadius:12,background:C.accentDim,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"Poppins",fontWeight:800,fontSize:18,color:C.accent,flexShrink:0}}>{sel.name[0]}</div>
+          <div style={{flex:1}}><h2 style={{fontFamily:"Poppins",fontWeight:800,fontSize:20,color:C.strong}}>{sel.name}</h2>
             <div style={{display:"flex",gap:4,marginTop:4,flexWrap:"wrap"}}>{(sel.tags||[]).map(t=><span key={t} style={{background:C.border,color:C.muted,padding:"2px 8px",borderRadius:20,fontSize:11}}>{t}</span>)}</div>
           </div>
           <Badge s={sel.status} C={C}/>
@@ -284,7 +284,7 @@ function Clientes({clients,setClients,history,plans,setPlans,setRec,C}){
         <div style={{marginTop:14}}><Btn C={C} sm ghost danger onClick={()=>setConfirm(sel.id)}>🗑 Excluir</Btn></div>
       </div>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:22,boxShadow:C.shadow}}>
-        <h3 style={{fontFamily:"Syne",fontWeight:700,marginBottom:14,color:C.strong,fontSize:14}}>Histórico</h3>
+        <h3 style={{fontFamily:"Poppins",fontWeight:700,marginBottom:14,color:C.strong,fontSize:14}}>Histórico</h3>
         {history.filter(h=>h.client===sel.name).map(h=><div key={h.id} style={{padding:"8px 0",borderBottom:`1px solid ${C.border}`}}>
           <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:12,fontWeight:600,color:C.accent}}>{h.type}</span><span style={{fontSize:11,color:C.muted}}>{fmt(h.date)}</span></div>
           <div style={{fontSize:12,color:C.muted,marginTop:2}}>{h.note}</div>
@@ -298,16 +298,16 @@ function Clientes({clients,setClients,history,plans,setPlans,setRec,C}){
 
   return <div>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-      <div><h1 style={{fontFamily:"Syne",fontSize:26,fontWeight:800,color:C.strong}}>Clientes</h1><p style={{color:C.muted,fontSize:13,marginTop:3}}>{clients.length} cadastrados</p></div>
+      <div><h1 style={{fontFamily:"Poppins",fontSize:26,fontWeight:800,color:C.strong}}>Clientes</h1><p style={{color:C.muted,fontSize:13,marginTop:3}}>{clients.length} cadastrados</p></div>
       <div style={{display:"flex",gap:8}}><Btn C={C} ghost sm onClick={()=>setPlanEd(true)}>✏️ Planos</Btn><Btn C={C} onClick={openNew}>+ Novo Cliente</Btn></div>
     </div>
     <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar cliente..." style={{...iS(C),marginBottom:14}}/>
     <div style={{display:"flex",flexDirection:"column",gap:10}}>
       {list.map(c=><div key={c.id} onClick={()=>setSel(c)} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:"14px 18px",cursor:"pointer",display:"flex",alignItems:"center",gap:14,transition:"border-color .15s",boxShadow:C.shadow}}
         onMouseEnter={e=>e.currentTarget.style.borderColor=C.accent} onMouseLeave={e=>e.currentTarget.style.borderColor=C.border}>
-        <div style={{width:40,height:40,borderRadius:10,background:C.accentDim,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"Syne",fontWeight:800,fontSize:15,color:C.accent,flexShrink:0}}>{c.name[0]}</div>
+        <div style={{width:40,height:40,borderRadius:10,background:C.accentDim,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"Poppins",fontWeight:800,fontSize:15,color:C.accent,flexShrink:0}}>{c.name[0]}</div>
         <div style={{flex:1}}><div style={{fontWeight:600,fontSize:14,color:C.strong}}>{c.name}</div><div style={{fontSize:11,color:C.muted,marginTop:2}}>{c.contact}</div></div>
-        <div style={{textAlign:"right",marginRight:8}}><div style={{fontFamily:"Syne",fontWeight:700,color:C.accent,fontSize:14,marginBottom:4}}>R$ {activeMRR(c).toLocaleString()}/mês</div><Badge s={c.status} C={C}/></div>
+        <div style={{textAlign:"right",marginRight:8}}><div style={{fontFamily:"Poppins",fontWeight:700,color:C.accent,fontSize:14,marginBottom:4}}>R$ {activeMRR(c).toLocaleString()}/mês</div><Badge s={c.status} C={C}/></div>
         <div style={{display:"flex",gap:4,flexWrap:"wrap",maxWidth:120,justifyContent:"flex-end"}}>{(c.tags||[]).map(t=><span key={t} style={{background:C.border,color:C.muted,padding:"2px 7px",borderRadius:20,fontSize:10}}>{t}</span>)}</div>
       </div>)}
     </div>
@@ -376,6 +376,10 @@ function Funil({kanban,setKanban,stages,setStages,C}){
     await supabase.from("nd_kanban").update({stage:col}).eq("id",dragging.card.id);
     setKanban(p=>{const n={...p};n[dragging.col]=(n[dragging.col]||[]).filter(c=>c.id!==dragging.card.id);n[col]=[...(n[col]||[]),{...dragging.card,stage:col}];return n;});
     setDragging(null);setOver(null);
+    // Reload kanban to ensure sync
+    const {data}=await supabase.from("nd_kanban").select("*");
+    const kb={};stages.forEach(s=>{kb[s]=(data||[]).filter(x=>x.stage===s);});
+    setKanban(kb);
   }
   async function saveStages(ns){
     setStages(ns);
@@ -386,7 +390,7 @@ function Funil({kanban,setKanban,stages,setStages,C}){
   return <div>
     {confetti&&<Confetti onDone={()=>setConfetti(false)}/>}
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-      <div><h1 style={{fontFamily:"Syne",fontSize:26,fontWeight:800,color:C.strong}}>Funil de Vendas</h1>
+      <div><h1 style={{fontFamily:"Poppins",fontSize:26,fontWeight:800,color:C.strong}}>Funil de Vendas</h1>
         <p style={{color:C.muted,fontSize:13,marginTop:3}}>Pipeline: <span style={{color:C.accent,fontWeight:700}}>R$ {total.toLocaleString()}</span></p></div>
       <div style={{display:"flex",gap:8}}><Btn C={C} ghost sm onClick={()=>setStageEd(true)}>✏️ Etapas</Btn><Btn C={C} onClick={()=>{setForm({name:"",value:"",resp:"",stage:stages[0]||""});setModal(true);}}>+ Oportunidade</Btn></div>
     </div>
@@ -394,7 +398,7 @@ function Funil({kanban,setKanban,stages,setStages,C}){
       {stages.map(stage=><div key={stage} onDragOver={e=>{e.preventDefault();setOver(stage);}} onDrop={e=>drop(e,stage)}
         style={{minWidth:220,flex:1,background:C.card,border:`2px solid ${over===stage?getC(stage):C.border}`,borderRadius:16,padding:14,transition:"border-color .15s",boxShadow:C.shadow}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:11}}>
-          <span style={{fontFamily:"Syne",fontWeight:700,fontSize:12,color:getC(stage)}}>{stage}</span>
+          <span style={{fontFamily:"Poppins",fontWeight:700,fontSize:12,color:getC(stage)}}>{stage}</span>
           <span style={{background:C.bg,borderRadius:20,padding:"2px 8px",fontSize:11,color:C.muted}}>{(kanban[stage]||[]).length}</span>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:7,minHeight:50,maxHeight:360,overflowY:"auto"}}>
@@ -438,7 +442,7 @@ function Atendimentos({history,setHistory,clients,attTypes,setAttTypes,C}){
   async function del(id){await supabase.from("nd_history").delete().eq("id",id);setHistory(p=>p.filter(x=>x.id!==id));}
   return <div>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-      <div><h1 style={{fontFamily:"Syne",fontSize:26,fontWeight:800,color:C.strong}}>Atendimentos</h1><p style={{color:C.muted,fontSize:13,marginTop:3}}>{history.length} registros</p></div>
+      <div><h1 style={{fontFamily:"Poppins",fontSize:26,fontWeight:800,color:C.strong}}>Atendimentos</h1><p style={{color:C.muted,fontSize:13,marginTop:3}}>{history.length} registros</p></div>
       <div style={{display:"flex",gap:8}}><Btn C={C} ghost sm onClick={()=>setTypeEd(true)}>✏️ Tipos</Btn><Btn C={C} onClick={()=>{setForm({client:"",type:attTypes[0]||"",user_name:"",note:"",date:today(),time:""});setModal(true);}}>+ Registrar</Btn></div>
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:10}}>
@@ -505,7 +509,7 @@ function Tarefas({tasks,setTasks,clients,C}){
   const pending=tasks.filter(t=>!t.done),done=tasks.filter(t=>t.done);
   return <div>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-      <div><h1 style={{fontFamily:"Syne",fontSize:26,fontWeight:800,color:C.strong}}>Tarefas</h1><p style={{color:C.muted,fontSize:13,marginTop:3}}>{pending.length} pendentes · {done.length} concluídas</p></div>
+      <div><h1 style={{fontFamily:"Poppins",fontSize:26,fontWeight:800,color:C.strong}}>Tarefas</h1><p style={{color:C.muted,fontSize:13,marginTop:3}}>{pending.length} pendentes · {done.length} concluídas</p></div>
       <Btn C={C} onClick={()=>setModal(true)}>+ Nova Tarefa</Btn>
     </div>
     <div style={{fontSize:11,fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:1,marginBottom:9}}>Pendentes</div>
@@ -577,7 +581,7 @@ function Financeiro({rec,setRec,pay,setPay,clients,C}){
   const pendPay=pay.filter(f=>f.status!=="Pago"&&f.status!=="Cancelado").reduce((a,f)=>a+Number(f.value),0);
   const paidPay=pay.filter(f=>f.status==="Pago").reduce((a,f)=>a+Number(f.value),0);
   const sColor=s=>s==="Pago"?C.success:s==="Atrasado"?C.danger:C.warning;
-  const TabBtn=({id,label})=><button onClick={()=>setTab(id)} style={{padding:"8px 20px",borderRadius:9,border:"none",background:tab===id?C.accent:"transparent",color:tab===id?"#fff":C.muted,cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"DM Sans",transition:"all .15s"}}>{label}</button>;
+  const TabBtn=({id,label})=><button onClick={()=>setTab(id)} style={{padding:"8px 20px",borderRadius:9,border:"none",background:tab===id?C.accent:"transparent",color:tab===id?"#fff":C.muted,cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"Inter,sans-serif",transition:"all .15s"}}>{label}</button>;
 
   const sortedAndFiltered=(data)=>{
     let filtered=data.filter(f=>{
@@ -591,7 +595,7 @@ function Financeiro({rec,setRec,pay,setPay,clients,C}){
 
   return <div>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-      <h1 style={{fontFamily:"Syne",fontSize:26,fontWeight:800,color:C.strong}}>Financeiro</h1>
+      <h1 style={{fontFamily:"Poppins",fontSize:26,fontWeight:800,color:C.strong}}>Financeiro</h1>
       <Btn C={C} onClick={()=>setModal(tab==="receber"?"rec":"pay")}>{tab==="receber"?"+ A Receber":"+ A Pagar"}</Btn>
     </div>
     <div style={{display:"flex",gap:14,flexWrap:"wrap",marginBottom:18}}>
@@ -603,7 +607,7 @@ function Financeiro({rec,setRec,pay,setPay,clients,C}){
     </div>
     <div style={{display:"flex",gap:10,marginBottom:16,alignItems:"center",flexWrap:"wrap"}}>
       <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar..." style={{...iS(C),flex:1,minWidth:250}}/>
-      <button onClick={()=>setSortOrder(o=>o==="asc"?"desc":"asc")} style={{background:C.accent,color:"#fff",border:"none",borderRadius:9,padding:"9px 16px",fontWeight:600,fontSize:13,cursor:"pointer",fontFamily:"DM Sans"}}>📅 {sortOrder==="asc"?"Crescente":"Decrescente"}</button>
+      <button onClick={()=>setSortOrder(o=>o==="asc"?"desc":"asc")} style={{background:C.accent,color:"#fff",border:"none",borderRadius:9,padding:"9px 16px",fontWeight:600,fontSize:13,cursor:"pointer",fontFamily:"Inter,sans-serif"}}>📅 {sortOrder==="asc"?"Crescente":"Decrescente"}</button>
     </div>
     <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,overflow:"hidden",boxShadow:C.shadow}}>
       <table style={{width:"100%",borderCollapse:"collapse"}}>
@@ -614,7 +618,7 @@ function Financeiro({rec,setRec,pay,setPay,clients,C}){
           {tab==="receber"&&sortedAndFiltered(rec).map((f,i)=><tr key={f.id} style={{borderTop:`1px solid ${C.border}`,background:i%2===0?"transparent":C.stripe}}>
             <td style={{padding:"11px 14px",fontWeight:600,fontSize:13,color:C.strong}}>{f.client}</td>
             <td style={{padding:"11px 14px",fontSize:12,color:C.muted}}>{f.description||"—"}</td>
-            <td style={{padding:"11px 14px",color:C.accent,fontFamily:"Syne",fontWeight:700,fontSize:13}}>R$ {Number(f.value).toLocaleString()}</td>
+            <td style={{padding:"11px 14px",color:C.accent,fontFamily:"Poppins",fontWeight:700,fontSize:13}}>R$ {Number(f.value).toLocaleString()}</td>
             <td style={{padding:"11px 14px",fontSize:12,color:C.muted}}>{fmt(f.due)}</td>
             <td style={{padding:"11px 14px",fontSize:12,color:C.muted}}>{f.paid?fmt(f.paid):"—"}</td>
             <td style={{padding:"11px 14px"}}><span style={{background:sColor(f.status)+"20",color:sColor(f.status),padding:"2px 9px",borderRadius:20,fontSize:11,fontWeight:700}}>{f.status}</span></td>
@@ -623,7 +627,7 @@ function Financeiro({rec,setRec,pay,setPay,clients,C}){
           {tab==="pagar"&&sortedAndFiltered(pay).map((f,i)=><tr key={f.id} style={{borderTop:`1px solid ${C.border}`,background:i%2===0?"transparent":C.stripe}}>
             <td style={{padding:"11px 14px",fontWeight:600,fontSize:13,color:C.strong}}>{f.description}</td>
             <td style={{padding:"11px 14px",fontSize:12,color:C.muted}}>{f.supplier}</td>
-            <td style={{padding:"11px 14px",color:C.warning,fontFamily:"Syne",fontWeight:700,fontSize:13}}>R$ {Number(f.value).toLocaleString()}</td>
+            <td style={{padding:"11px 14px",color:C.warning,fontFamily:"Poppins",fontWeight:700,fontSize:13}}>R$ {Number(f.value).toLocaleString()}</td>
             <td style={{padding:"11px 14px",fontSize:12,color:C.muted}}>{fmt(f.due)}</td>
             <td style={{padding:"11px 14px",fontSize:12,color:C.muted}}>{f.paid?fmt(f.paid):"—"}</td>
             <td style={{padding:"11px 14px"}}><span style={{background:sColor(f.status)+"20",color:sColor(f.status),padding:"2px 9px",borderRadius:20,fontSize:11,fontWeight:700}}>{f.status}</span></td>
@@ -698,12 +702,12 @@ function Usuarios({users,setUsers,C}){
   async function del(id){await supabase.from("nd_users").delete().eq("id",id);setUsers(p=>p.filter(x=>x.id!==id));setConfirm(null);}
   return <div>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-      <div><h1 style={{fontFamily:"Syne",fontSize:26,fontWeight:800,color:C.strong}}>Usuários</h1><p style={{color:C.muted,fontSize:13,marginTop:3}}>{users.length} cadastrados</p></div>
+      <div><h1 style={{fontFamily:"Poppins",fontSize:26,fontWeight:800,color:C.strong}}>Usuários</h1><p style={{color:C.muted,fontSize:13,marginTop:3}}>{users.length} cadastrados</p></div>
       <Btn C={C} onClick={()=>{setForm({name:"",email:"",password:"",role:"user",permissions:["Dashboard"]});setModal("new");}}>+ Novo Usuário</Btn>
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:10}}>
       {users.map(u=><div key={u.id} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:"14px 18px",display:"flex",alignItems:"center",gap:14,boxShadow:C.shadow}}>
-        <div style={{width:40,height:40,borderRadius:10,background:C.accentDim,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"Syne",fontWeight:800,fontSize:15,color:C.accent,flexShrink:0}}>{u.name[0]}</div>
+        <div style={{width:40,height:40,borderRadius:10,background:C.accentDim,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"Poppins",fontWeight:800,fontSize:15,color:C.accent,flexShrink:0}}>{u.name[0]}</div>
         <div style={{flex:1}}><div style={{fontWeight:600,fontSize:14,color:C.strong}}>{u.name}</div><div style={{fontSize:11,color:C.muted,marginTop:2}}>{u.email}</div></div>
         <Badge s={u.role} C={C}/>
         <div style={{display:"flex",gap:4,flexWrap:"wrap",maxWidth:220,justifyContent:"flex-end"}}>{(u.permissions||[]).map(p=><span key={p} style={{background:C.border,color:C.muted,padding:"2px 7px",borderRadius:20,fontSize:10}}>{p}</span>)}</div>
@@ -863,19 +867,19 @@ export default function App(){
             <div style={{width:34,height:34,borderRadius:8,background:"#6c63ff22",border:"1.5px solid #6c63ff44",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" strokeWidth="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
             </div>
-            <div><div style={{fontFamily:"Syne",fontWeight:800,fontSize:14,color:"#f1f5f9",lineHeight:1.2}}>Natividade</div><div style={{fontFamily:"Syne",fontWeight:700,fontSize:9,color:"#6c63ff",letterSpacing:2}}>DIGITAL</div></div>
+            <div><div style={{fontFamily:"Poppins",fontWeight:800,fontSize:14,color:"#f1f5f9",lineHeight:1.2}}>Natividade</div><div style={{fontFamily:"Poppins",fontWeight:700,fontSize:9,color:"#6c63ff",letterSpacing:2}}>DIGITAL</div></div>
           </div>
         </div>
         <nav style={{flex:1,padding:"10px",overflowY:"auto"}}>
-          {visibleNav.map(item=>{const on=active===item.id;return <button key={item.id} onClick={()=>setActive(item.id)} style={{width:"100%",display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:on?"#6c63ff22":"transparent",border:"none",borderRadius:9,color:on?"#a8a3ff":"#5a6a7e",cursor:"pointer",textAlign:"left",fontSize:13.5,fontWeight:on?600:400,marginBottom:2,fontFamily:"DM Sans",transition:"all .12s"}}><span style={{color:on?"#a8a3ff":"#3d4f63",flexShrink:0}}>{item.icon}</span>{item.id}</button>;})}
+          {visibleNav.map(item=>{const on=active===item.id;return <button key={item.id} onClick={()=>setActive(item.id)} style={{width:"100%",display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:on?"#6c63ff22":"transparent",border:"none",borderRadius:9,color:on?"#a8a3ff":"#5a6a7e",cursor:"pointer",textAlign:"left",fontSize:13.5,fontWeight:on?600:400,marginBottom:2,fontFamily:"Inter,sans-serif",transition:"all .12s"}}><span style={{color:on?"#a8a3ff":"#3d4f63",flexShrink:0}}>{item.icon}</span>{item.id}</button>;})}
         </nav>
         <div style={{padding:"12px 10px",borderTop:`1px solid ${C.sidebarBorder}`}}>
-          <button onClick={toggleTheme} style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:7,padding:"8px 12px",background:"#ffffff08",border:"1px solid #ffffff10",borderRadius:9,color:"#7a8a9e",cursor:"pointer",marginBottom:10,fontSize:12,fontFamily:"DM Sans"}}>
+          <button onClick={toggleTheme} style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:7,padding:"8px 12px",background:"#ffffff08",border:"1px solid #ffffff10",borderRadius:9,color:"#7a8a9e",cursor:"pointer",marginBottom:10,fontSize:12,fontFamily:"Inter,sans-serif"}}>
             {theme==="dark"?"☀️ Modo Claro":"🌙 Modo Escuro"}
           </button>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"4px 8px"}}>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
-              <div style={{width:28,height:28,borderRadius:7,background:"#6c63ff22",display:"flex",alignItems:"center",justifyContent:"center",color:"#a8a3ff",fontWeight:800,fontFamily:"Syne",fontSize:12,flexShrink:0}}>{user.name[0]}</div>
+              <div style={{width:28,height:28,borderRadius:7,background:"#6c63ff22",display:"flex",alignItems:"center",justifyContent:"center",color:"#a8a3ff",fontWeight:800,fontFamily:"Poppins",fontSize:12,flexShrink:0}}>{user.name[0]}</div>
               <div><div style={{fontSize:12,fontWeight:600,color:"#c8d0de"}}>{user.name}</div><div style={{fontSize:10,color:"#3d4f63"}}>{user.role}</div></div>
             </div>
             <button onClick={()=>setUser(null)} title="Sair" style={{background:"none",border:"none",color:"#4b5a72",cursor:"pointer",fontSize:16}}>⏏</button>
