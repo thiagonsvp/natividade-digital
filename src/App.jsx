@@ -497,6 +497,8 @@ function Financeiro({rec,setRec,pay,setPay,clients,C}){
   const [confirm,setConfirm]=useState(null);
   const [formR,setFormR]=useState({client:"",value:"",due:"",description:""});
   const [formP,setFormP]=useState({description:"",supplier:"",value:"",category:"",due:""});
+  const [search,setSearch]=useState("");
+  const [sortOrder,setSortOrder]=useState("asc");
 
   useEffect(()=>{
     const t=today();
@@ -525,6 +527,16 @@ function Financeiro({rec,setRec,pay,setPay,clients,C}){
   const sColor=s=>s==="Pago"?C.success:s==="Atrasado"?C.danger:C.warning;
   const TabBtn=({id,label})=><button onClick={()=>setTab(id)} style={{padding:"8px 20px",borderRadius:9,border:"none",background:tab===id?C.accent:"transparent",color:tab===id?"#fff":C.muted,cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"DM Sans",transition:"all .15s"}}>{label}</button>;
 
+  const sortedAndFiltered=(data)=>{
+    let filtered=data.filter(f=>{
+      const s=search.toLowerCase();
+      if(tab==="receber") return f.client.toLowerCase().includes(s)||(f.description||"").toLowerCase().includes(s);
+      return f.description.toLowerCase().includes(s)||f.supplier.toLowerCase().includes(s);
+    });
+    filtered.sort((a,b)=>(sortOrder==="asc"?1:-1)*a.due.localeCompare(b.due));
+    return filtered;
+  };
+
   return <div>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
       <h1 style={{fontFamily:"Syne",fontSize:26,fontWeight:800,color:C.strong}}>Financeiro</h1>
@@ -544,6 +556,10 @@ function Financeiro({rec,setRec,pay,setPay,clients,C}){
       <TabBtn id="receber" label="Contas a Receber"/>
       <TabBtn id="pagar" label="Contas a Pagar"/>
     </div>
+    <div style={{display:"flex",gap:10,marginBottom:16,alignItems:"center",flexWrap:"wrap"}}>
+      <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar..." style={{...iS(C),flex:1,minWidth:250}}/>
+      <button onClick={()=>setSortOrder(o=>o==="asc"?"desc":"asc")} style={{background:C.accent,color:"#fff",border:"none",borderRadius:9,padding:"9px 16px",fontWeight:600,fontSize:13,cursor:"pointer",fontFamily:"DM Sans"}}>📅 {sortOrder==="asc"?"Crescente":"Decrescente"}</button>
+    </div>
     <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,overflow:"hidden",boxShadow:C.shadow}}>
       <table style={{width:"100%",borderCollapse:"collapse"}}>
         <thead><tr style={{background:C.bg}}>
@@ -553,7 +569,7 @@ function Financeiro({rec,setRec,pay,setPay,clients,C}){
           ).map(h=><th key={h} style={{padding:"10px 14px",textAlign:"left",fontSize:11,color:C.muted,textTransform:"uppercase",letterSpacing:.7,fontWeight:700}}>{h}</th>)}
         </tr></thead>
         <tbody>
-          {tab==="receber"&&rec.map((f,i)=><tr key={f.id} style={{borderTop:`1px solid ${C.border}`,background:i%2===0?"transparent":C.stripe}}>
+          {tab==="receber"&&sortedAndFiltered(rec).map((f,i)=><tr key={f.id} style={{borderTop:`1px solid ${C.border}`,background:i%2===0?"transparent":C.stripe}}>
             <td style={{padding:"11px 14px",fontWeight:600,fontSize:13,color:C.strong}}>{f.client}</td>
             <td style={{padding:"11px 14px",fontSize:12,color:C.muted}}>{f.description||"—"}</td>
             <td style={{padding:"11px 14px",color:C.accent,fontFamily:"Syne",fontWeight:700,fontSize:13}}>R$ {Number(f.value).toLocaleString()}</td>
@@ -566,7 +582,7 @@ function Financeiro({rec,setRec,pay,setPay,clients,C}){
               <button onClick={()=>setConfirm({id:f.id,tipo:"rec"})} style={{background:"none",border:"none",color:C.danger,cursor:"pointer",fontSize:13,opacity:.7}}>🗑</button>
             </div></td>
           </tr>)}
-          {tab==="pagar"&&pay.map((f,i)=><tr key={f.id} style={{borderTop:`1px solid ${C.border}`,background:i%2===0?"transparent":C.stripe}}>
+          {tab==="pagar"&&sortedAndFiltered(pay).map((f,i)=><tr key={f.id} style={{borderTop:`1px solid ${C.border}`,background:i%2===0?"transparent":C.stripe}}>
             <td style={{padding:"11px 14px",fontWeight:600,fontSize:13,color:C.strong}}>{f.description}</td>
             <td style={{padding:"11px 14px",fontSize:12,color:C.muted}}>{f.supplier}</td>
             <td style={{padding:"11px 14px",color:C.warning,fontFamily:"Syne",fontWeight:700,fontSize:13}}>R$ {Number(f.value).toLocaleString()}</td>
