@@ -772,6 +772,17 @@ export default function App(){
       @keyframes blink{0%,100%{opacity:1}50%{opacity:.45}}
       @keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
       .page{animation:fadeUp .2s ease;}
+      @media(max-width:768px){
+        body{font-size:14px;}
+        h1{font-size:20px !important;}
+        h2{font-size:18px !important;}
+        h3{font-size:15px !important;}
+        button{font-size:12px !important;padding:6px 12px !important;}
+        input,select,textarea{font-size:13px !important;padding:8px 10px !important;}
+        table{font-size:12px !important;}
+        td,th{padding:8px 10px !important;}
+        div{font-size:13px !important;}
+      }
     `}</style>
     <div style={{display:"flex",height:"100vh",width:"100vw",overflow:"hidden",background:C.bg,color:C.text}}>
       <div style={{width:sidebarOpen?220:0,minWidth:0,background:C.sidebar,borderRight:`1px solid ${C.sidebarBorder}`,display:"flex",flexDirection:"column",height:"100vh",transition:"width .2s",overflow:"hidden"}}>
