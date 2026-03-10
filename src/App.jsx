@@ -248,7 +248,7 @@ function Clientes({clients,setClients,history,plans,setPlans,setRec,setPay,pay,r
             // Calculate commission for this installment
             if(form.comissao_percentual&&Number(form.comissao_percentual)>0){
               const comValue=val*Number(form.comissao_percentual)/100;
-              comRows.push({id:uid(),client:form.name,value:comValue,status:"Pendente",due,paid:"",description:`Comissão - Parcela ${i+1}/${p.parcelas}`});
+              comRows.push({id:uid(),supplier:form.name,value:comValue,status:"Pendente",due,paid:"",description:`Comissão - Parcela ${i+1}/${p.parcelas}`});
             }
           }
         } else {
@@ -258,7 +258,7 @@ function Clientes({clients,setClients,history,plans,setPlans,setRec,setPay,pay,r
             // Calculate commission for this month
             if(form.comissao_percentual&&Number(form.comissao_percentual)>0){
               const comValue=val*Number(form.comissao_percentual)/100;
-              comRows.push({id:uid(),client:form.name,value:comValue,status:"Pendente",due,paid:"",description:`Comissão - ${new Date(due+"T12:00:00").toLocaleDateString("pt-BR",{month:"short",year:"numeric"})}`});
+              comRows.push({id:uid(),supplier:form.name,value:comValue,status:"Pendente",due,paid:"",description:`Comissão - ${new Date(due+"T12:00:00").toLocaleDateString("pt-BR",{month:"short",year:"numeric"})}`});
             }
           }
         }
@@ -290,6 +290,12 @@ function Clientes({clients,setClients,history,plans,setPlans,setRec,setPay,pay,r
       await supabase.from("nd_rec").update({status:"Cancelado"}).eq("id",r.id);
     }
     setRec(p=>p.map(r=>futureRecs.some(fr=>fr.id===r.id)?{...r,status:"Cancelado"}:r));
+    // Cancel all pending payables (commissions) after cancel date
+    const futurePays=pay.filter(p=>p.supplier===sel.name&&p.status==="Pendente"&&p.due>=cancelDate);
+    for(const p of futurePays){
+      await supabase.from("nd_pay").update({status:"Cancelado"}).eq("id",p.id);
+    }
+    setPay(p=>p.map(p=>futurePays.some(fp=>fp.id===p.id)?{...p,status:"Cancelado"}:p));
     // Add cancellation history
     const histEntry={id:uid(),client:sel.name,type:"Cancelamento",note:`Motivo: ${cancelReason}. Data: ${fmt(cancelDate)}`,date:today(),user_name:""};
     setSel({...sel,status:"Cancelado"});
