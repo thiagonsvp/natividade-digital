@@ -24,7 +24,7 @@ function addMonths(dateStr, n) {
 
 const TH = {
   dark:  { bg:"#07091a",surface:"#0f1524",card:"#141b2d",border:"#1e293b",accent:"#6c63ff",accentDim:"#6c63ff18",text:"#cbd5e1",strong:"#f1f5f9",muted:"#4b5a72",inputBg:"#0b0f1f",danger:"#f43f5e",warning:"#fb923c",success:"#34d399",blue:"#60a5fa",purple:"#c084fc",stripe:"#ffffff04",shadow:"0 4px 24px #00000055",sidebar:"#080c1c",sidebarBorder:"#1a2235" },
-  light: { bg:"#f0f4ff",surface:"#ffffff",card:"#ffffff",border:"#dde3f0",accent:"#5b50ef",accentDim:"#5b50ef14",text:"#4b5772",strong:"#0f172a",muted:"#8fa0bc",inputBg:"#f8f9ff",danger:"#e11d48",warning:"#ea580c",success:"#059669",blue:"#2563eb",purple:"#9333ea",stripe:"#f8f9ff",shadow:"0 2px 12px #0000000d",sidebar:"#12193a",sidebarBorder:"#1e2d4a" },
+  light: { bg:"#f0f4ff",surface:"#ffffff",card:"#ffffff",border:"#d0d8e8",accent:"#5b50ef",accentDim:"#5b50ef14",text:"#3d4f63",strong:"#0a0f1e",muted:"#6b7a94",inputBg:"#f8f9ff",danger:"#d91e45",warning:"#d97706",success:"#0f7938",blue:"#1d4ed8",purple:"#7c3aed",stripe:"#f0f2f9",shadow:"0 2px 12px #00000010",sidebar:"#0f1b3a",sidebarBorder:"#1a2d4a" },
 };
 const ALL_PAGES = ["Dashboard","Clientes","Funil","Atendimentos","Tarefas","Financeiro","Usuários"];
 
@@ -103,8 +103,8 @@ function Login({onLogin,theme,toggleTheme,C}){
     if(error||!data){setErr("E-mail ou senha incorretos.");return;}
     onLogin(data);
   }
-  return <div style={{minHeight:"100vh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"DM Sans,sans-serif"}}>
-    <div style={{width:420,padding:40,background:C.surface,border:`1px solid ${C.border}`,borderRadius:24,boxShadow:C.shadow}}>
+  return <div style={{minHeight:"100vh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"DM Sans,sans-serif",padding:"20px"}}>
+    <div style={{width:"100%",maxWidth:420,padding:"40px 20px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:24,boxShadow:C.shadow}}>
       <div style={{textAlign:"center",marginBottom:32}}>
         <div style={{width:52,height:52,borderRadius:14,background:"#6c63ff22",border:"2px solid #6c63ff44",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" strokeWidth="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
@@ -484,6 +484,8 @@ function Financeiro({rec,setRec,pay,setPay,clients,C}){
   const [confirm,setConfirm]=useState(null);
   const [formR,setFormR]=useState({client:"",value:"",due:"",description:""});
   const [formP,setFormP]=useState({description:"",supplier:"",value:"",category:"",due:""});
+  const [search,setSearch]=useState("");
+  const [sortOrder,setSortOrder]=useState("asc");
 
   useEffect(()=>{
     const t=today();
@@ -525,6 +527,16 @@ function Financeiro({rec,setRec,pay,setPay,clients,C}){
   const sColor=s=>s==="Pago"?C.success:s==="Atrasado"?C.danger:C.warning;
   const TabBtn=({id,label})=><button onClick={()=>setTab(id)} style={{padding:"8px 20px",borderRadius:9,border:"none",background:tab===id?C.accent:"transparent",color:tab===id?"#fff":C.muted,cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"DM Sans",transition:"all .15s"}}>{label}</button>;
 
+  const sortedAndFiltered=(data)=>{
+    let filtered=data.filter(f=>{
+      const s=search.toLowerCase();
+      if(tab==="receber") return f.client.toLowerCase().includes(s)||(f.description||"").toLowerCase().includes(s);
+      return f.description.toLowerCase().includes(s)||f.supplier.toLowerCase().includes(s);
+    });
+    filtered.sort((a,b)=>(sortOrder==="asc"?1:-1)*a.due.localeCompare(b.due));
+    return filtered;
+  };
+
   return <div>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
       <h1 style={{fontFamily:"Syne",fontSize:26,fontWeight:800,color:C.strong}}>Financeiro</h1>
@@ -537,13 +549,17 @@ function Financeiro({rec,setRec,pay,setPay,clients,C}){
     <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:"4px 6px",display:"inline-flex",gap:4,marginBottom:16}}>
       <TabBtn id="receber" label="Contas a Receber"/><TabBtn id="pagar" label="Contas a Pagar"/>
     </div>
+    <div style={{display:"flex",gap:10,marginBottom:16,alignItems:"center",flexWrap:"wrap"}}>
+      <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar..." style={{...iS(C),flex:1,minWidth:250}}/>
+      <button onClick={()=>setSortOrder(o=>o==="asc"?"desc":"asc")} style={{background:C.accent,color:"#fff",border:"none",borderRadius:9,padding:"9px 16px",fontWeight:600,fontSize:13,cursor:"pointer",fontFamily:"DM Sans"}}>📅 {sortOrder==="asc"?"Crescente":"Decrescente"}</button>
+    </div>
     <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,overflow:"hidden",boxShadow:C.shadow}}>
       <table style={{width:"100%",borderCollapse:"collapse"}}>
         <thead><tr style={{background:C.bg}}>
           {(tab==="receber"?["Cliente","Descrição","Valor","Vencimento","Pagamento","Status","Ações"]:["Descrição","Fornecedor","Valor","Vencimento","Pagamento","Status","Ações"]).map(h=><th key={h} style={{padding:"10px 14px",textAlign:"left",fontSize:11,color:C.muted,textTransform:"uppercase",letterSpacing:.7,fontWeight:700}}>{h}</th>)}
         </tr></thead>
         <tbody>
-          {tab==="receber"&&rec.map((f,i)=><tr key={f.id} style={{borderTop:`1px solid ${C.border}`,background:i%2===0?"transparent":C.stripe}}>
+          {tab==="receber"&&sortedAndFiltered(rec).map((f,i)=><tr key={f.id} style={{borderTop:`1px solid ${C.border}`,background:i%2===0?"transparent":C.stripe}}>
             <td style={{padding:"11px 14px",fontWeight:600,fontSize:13,color:C.strong}}>{f.client}</td>
             <td style={{padding:"11px 14px",fontSize:12,color:C.muted}}>{f.description||"—"}</td>
             <td style={{padding:"11px 14px",color:C.accent,fontFamily:"Syne",fontWeight:700,fontSize:13}}>R$ {Number(f.value).toLocaleString()}</td>
@@ -552,7 +568,7 @@ function Financeiro({rec,setRec,pay,setPay,clients,C}){
             <td style={{padding:"11px 14px"}}><span style={{background:sColor(f.status)+"20",color:sColor(f.status),padding:"2px 9px",borderRadius:20,fontSize:11,fontWeight:700}}>{f.status}</span></td>
             <td style={{padding:"11px 14px"}}><div style={{display:"flex",gap:5}}>{f.status!=="Pago"&&<Btn C={C} sm onClick={()=>{setBaixaDate(today());setBaixaModal({id:f.id,tipo:"rec"});}}>Baixar</Btn>}<Btn C={C} sm ghost onClick={()=>setEditItem({...f,_tipo:"rec"})}>✏️</Btn><button onClick={()=>setConfirm({id:f.id,tipo:"rec"})} style={{background:"none",border:"none",color:C.danger,cursor:"pointer",fontSize:14,opacity:.7}}>🗑</button></div></td>
           </tr>)}
-          {tab==="pagar"&&pay.map((f,i)=><tr key={f.id} style={{borderTop:`1px solid ${C.border}`,background:i%2===0?"transparent":C.stripe}}>
+          {tab==="pagar"&&sortedAndFiltered(pay).map((f,i)=><tr key={f.id} style={{borderTop:`1px solid ${C.border}`,background:i%2===0?"transparent":C.stripe}}>
             <td style={{padding:"11px 14px",fontWeight:600,fontSize:13,color:C.strong}}>{f.description}</td>
             <td style={{padding:"11px 14px",fontSize:12,color:C.muted}}>{f.supplier}</td>
             <td style={{padding:"11px 14px",color:C.warning,fontFamily:"Syne",fontWeight:700,fontSize:13}}>R$ {Number(f.value).toLocaleString()}</td>
@@ -676,6 +692,7 @@ const NAV=[
 export default function App(){
   const [theme,setTheme]=useState(()=>localStorage.getItem("nd:theme")||"dark");
   const [user,setUser]=useState(()=>{try{const r=localStorage.getItem("nd:session");return r?JSON.parse(r):null;}catch{return null;}});
+  const [sidebarOpen,setSidebarOpen]=useState(true);
   const [active,setActive]=useState("Dashboard");
   const [loading,setLoading]=useState(true);
   const [clients,setClients]=useState([]);
@@ -757,7 +774,7 @@ export default function App(){
       .page{animation:fadeUp .2s ease;}
     `}</style>
     <div style={{display:"flex",height:"100vh",width:"100vw",overflow:"hidden",background:C.bg,color:C.text}}>
-      <div style={{width:220,minWidth:220,background:C.sidebar,borderRight:`1px solid ${C.sidebarBorder}`,display:"flex",flexDirection:"column",height:"100vh"}}>
+      <div style={{width:sidebarOpen?220:0,minWidth:0,background:C.sidebar,borderRight:`1px solid ${C.sidebarBorder}`,display:"flex",flexDirection:"column",height:"100vh",transition:"width .2s",overflow:"hidden"}}>
         <div style={{padding:"20px 18px 16px",borderBottom:`1px solid ${C.sidebarBorder}`}}>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
             <div style={{width:34,height:34,borderRadius:8,background:"#6c63ff22",border:"1.5px solid #6c63ff44",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
@@ -782,8 +799,13 @@ export default function App(){
           </div>
         </div>
       </div>
-      <div style={{flex:1,overflowY:"auto",padding:"28px 36px",minWidth:0}}>
+      <div style={{flex:1,display:"flex",flexDirection:"column",minWidth:0}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 20px",borderBottom:`1px solid ${C.border}`,background:C.surface}}>
+          <button onClick={()=>setSidebarOpen(s=>!s)} style={{background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:18}}>☰</button>
+        </div>
+        <div style={{flex:1,overflowY:"auto",padding:"28px max(20px, calc((100vw - 1200px) / 2))",minWidth:0}}>
         <div className="page" key={active}>{pages[active]}</div>
+      </div>
       </div>
     </div>
   </>;
