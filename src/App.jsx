@@ -138,19 +138,30 @@ function Dashboard({clients,tasks,history,rec,pay,C}){
   const lateRec=rec.filter(f=>f.status==="Atrasado").reduce((a,f)=>a+Number(f.value),0);
   const pendPay=pay.filter(p=>p.status!=="Pago"&&p.status!=="Cancelado").reduce((a,p)=>a+Number(p.value),0);
   
-  // Dados para gráfico de financeiro
-  const byStatus={"Pago":0,"Pendente":0,"Atrasado":0};
-  rec.forEach(r=>{if(byStatus[r.status]!==undefined) byStatus[r.status]+=Number(r.value);});
+  // Dados para gráfico mês a mês
+  const monthMap={};
+  rec.forEach(r=>{
+    if(r.due){
+      const month=r.due.slice(0,7);
+      if(!monthMap[month]) monthMap[month]={receita:0,despesa:0};
+      monthMap[month].receita+=Number(r.value);
+    }
+  });
+  pay.forEach(p=>{
+    if(p.due){
+      const month=p.due.slice(0,7);
+      if(!monthMap[month]) monthMap[month]={receita:0,despesa:0};
+      monthMap[month].despesa+=Number(p.value);
+    }
+  });
+  
+  const months=Object.keys(monthMap).sort().slice(-12);
   const chartData={
-    labels:["Recebido","Pendente","Atrasado"],
-    datasets:[{
-      label:"Contas a Receber (R$)",
-      data:[byStatus["Pago"],byStatus["Pendente"],byStatus["Atrasado"]],
-      backgroundColor:[C.success+"40",C.warning+"40",C.danger+"40"],
-      borderColor:[C.success,C.warning,C.danger],
-      borderWidth:2,
-      fill:true
-    }]
+    labels:months.map(m=>{const [y,mo]=m.split("-");return `${mo}/${y.slice(-2)}`;}),
+    datasets:[
+      {label:"Receita",data:months.map(m=>monthMap[m].receita),backgroundColor:C.blue+"40",borderColor:C.blue,borderWidth:2},
+      {label:"Despesa",data:months.map(m=>monthMap[m].despesa),backgroundColor:C.warning+"40",borderColor:C.warning,borderWidth:2}
+    ]
   };
   
   return <div>
@@ -163,7 +174,7 @@ function Dashboard({clients,tasks,history,rec,pay,C}){
       <Stat C={C} label="Contas a Pagar" value={`R$ ${pendPay.toLocaleString()}`} color={C.warning}/>
     </div>
     <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:20,marginBottom:22,boxShadow:C.shadow}}>
-      <h3 style={{fontFamily:"Syne",fontWeight:700,fontSize:15,marginBottom:14,color:C.strong}}>Contas a Receber por Status</h3>
+      <h3 style={{fontFamily:"Syne",fontWeight:700,fontSize:15,marginBottom:14,color:C.strong}}>Receita vs Despesa (últimos 12 meses)</h3>
       <div style={{height:300}}>
         <Bar data={chartData} options={{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}},scales:{y:{beginAtZero:true}}}} />
       </div>
