@@ -155,16 +155,12 @@ function Dashboard({clients,tasks,history,rec,pay,C}){
     }
   });
   
-  // Get current month and 2 months prior
+  // Get current month and generate 12-month window starting 2 months prior
   const today=new Date();
-  const currentMonth=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0");
-  const twoMonthsAgo=new Date(today.getFullYear(),today.getMonth()-2,1);
-  const startMonth=twoMonthsAgo.getFullYear()+"-"+String(twoMonthsAgo.getMonth()+1).padStart(2,"0");
-  
-  // Generate 3-month window (current + 2 prior), filling missing months with 0
+  const startDate=new Date(today.getFullYear(),today.getMonth()-2,1);
   const months=[];
-  let current=new Date(twoMonthsAgo);
-  for(let i=0;i<3;i++){
+  let current=new Date(startDate);
+  for(let i=0;i<12;i++){
     const month=current.getFullYear()+"-"+String(current.getMonth()+1).padStart(2,"0");
     if(!monthMap[month]) monthMap[month]={receita:0,despesa:0};
     months.push(month);
@@ -373,13 +369,17 @@ function Funil({kanban,setKanban,stages,setStages,C}){
   async function drop(e,col){
     if(!dragging||dragging.col===col)return;
     if(dragging.col!=="Fechado"&&col==="Fechado") setConfetti(true);
+    const updatedCard={...dragging.card,stage:col};
     await supabase.from("nd_kanban").update({stage:col}).eq("id",dragging.card.id);
-    setKanban(p=>{const n={...p};n[dragging.col]=(n[dragging.col]||[]).filter(c=>c.id!==dragging.card.id);n[col]=[...(n[col]||[]),{...dragging.card,stage:col}];return n;});
-    setDragging(null);setOver(null);
-    // Reload kanban to ensure sync
-    const {data}=await supabase.from("nd_kanban").select("*");
-    const kb={};stages.forEach(s=>{kb[s]=(data||[]).filter(x=>x.stage===s);});
-    setKanban(kb);
+    // Update state immediately without waiting for reload
+    setKanban(p=>{
+      const newState={...p};
+      newState[dragging.col]=(newState[dragging.col]||[]).filter(c=>c.id!==dragging.card.id);
+      newState[col]=[...(newState[col]||[]),updatedCard];
+      return newState;
+    });
+    setDragging(null);
+    setOver(null);
   }
   async function saveStages(ns){
     setStages(ns);
