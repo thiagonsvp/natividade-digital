@@ -155,7 +155,22 @@ function Dashboard({clients,tasks,history,rec,pay,C}){
     }
   });
   
-  const months=Object.keys(monthMap).sort().slice(-12);
+  // Get current month and 2 months prior
+  const today=new Date();
+  const currentMonth=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0");
+  const twoMonthsAgo=new Date(today.getFullYear(),today.getMonth()-2,1);
+  const startMonth=twoMonthsAgo.getFullYear()+"-"+String(twoMonthsAgo.getMonth()+1).padStart(2,"0");
+  
+  // Generate 3-month window (current + 2 prior), filling missing months with 0
+  const months=[];
+  let current=new Date(twoMonthsAgo);
+  for(let i=0;i<3;i++){
+    const month=current.getFullYear()+"-"+String(current.getMonth()+1).padStart(2,"0");
+    if(!monthMap[month]) monthMap[month]={receita:0,despesa:0};
+    months.push(month);
+    current.setMonth(current.getMonth()+1);
+  }
+  
   const chartData={
     labels:months.map(m=>{const [y,mo]=m.split("-");return `${mo}/${y.slice(-2)}`;}),
     datasets:[
