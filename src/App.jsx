@@ -1,5 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Line, Bar } from 'react-chartjs-2';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
 const supabase = createClient(
   "https://xzvlzdqwgqdqvxyrykmi.supabase.co",
@@ -133,6 +137,22 @@ function Dashboard({clients,tasks,history,rec,pay,C}){
   const mrr=clients.filter(c=>c.status==="Ativo").reduce((a,c)=>a+activeMRR(c),0);
   const lateRec=rec.filter(f=>f.status==="Atrasado").reduce((a,f)=>a+Number(f.value),0);
   const pendPay=pay.filter(p=>p.status!=="Pago"&&p.status!=="Cancelado").reduce((a,p)=>a+Number(p.value),0);
+  
+  // Dados para gráfico de financeiro
+  const byStatus={"Pago":0,"Pendente":0,"Atrasado":0};
+  rec.forEach(r=>{if(byStatus[r.status]!==undefined) byStatus[r.status]+=Number(r.value);});
+  const chartData={
+    labels:["Recebido","Pendente","Atrasado"],
+    datasets:[{
+      label:"Contas a Receber (R$)",
+      data:[byStatus["Pago"],byStatus["Pendente"],byStatus["Atrasado"]],
+      backgroundColor:[C.success+"40",C.warning+"40",C.danger+"40"],
+      borderColor:[C.success,C.warning,C.danger],
+      borderWidth:2,
+      fill:true
+    }]
+  };
+  
   return <div>
     <h1 style={{fontFamily:"Syne",fontSize:26,fontWeight:800,color:C.strong,marginBottom:4}}>Dashboard</h1>
     <p style={{color:C.muted,fontSize:13,marginBottom:22}}>{new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</p>
@@ -141,6 +161,12 @@ function Dashboard({clients,tasks,history,rec,pay,C}){
       <Stat C={C} label="Clientes Ativos" value={clients.filter(c=>c.status==="Ativo").length} color={C.blue}/>
       <Stat C={C} label="A Receber Atrasado" value={`R$ ${lateRec.toLocaleString()}`} color={C.danger}/>
       <Stat C={C} label="Contas a Pagar" value={`R$ ${pendPay.toLocaleString()}`} color={C.warning}/>
+    </div>
+    <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:20,marginBottom:22,boxShadow:C.shadow}}>
+      <h3 style={{fontFamily:"Syne",fontWeight:700,fontSize:15,marginBottom:14,color:C.strong}}>Contas a Receber por Status</h3>
+      <div style={{height:300}}>
+        <Bar data={chartData} options={{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}},scales:{y:{beginAtZero:true}}}} />
+      </div>
     </div>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:18}}>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:20,boxShadow:C.shadow}}>
