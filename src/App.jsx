@@ -238,23 +238,33 @@ function Clientes({clients,setClients,history,plans,setPlans,setRec,setPay,pay,r
       await supabase.from("nd_clients").insert(obj);
       setClients(p=>[...p,obj]);
       const rows=[];
+      const comRows=[];
       vs.forEach(p=>{
         const val=Number(p.value);
         if(p.tipo==="parcelado"&&p.parcelas>0){
-          for(let i=0;i<Number(p.parcelas);i++){const due=addMonths(p.from,i);rows.push({id:uid(),client:form.name,value:val,status:"Pendente",due,paid:"",description:`Parcela ${i+1}/${p.parcelas}`});}
+          for(let i=0;i<Number(p.parcelas);i++){
+            const due=addMonths(p.from,i);
+            rows.push({id:uid(),client:form.name,value:val,status:"Pendente",due,paid:"",description:`Parcela ${i+1}/${p.parcelas}`});
+            // Calculate commission for this installment
+            if(form.comissao_percentual&&Number(form.comissao_percentual)>0){
+              const comValue=val*Number(form.comissao_percentual)/100;
+              comRows.push({id:uid(),client:form.name,value:comValue,status:"Pendente",due,paid:"",description:`Comissão - Parcela ${i+1}/${p.parcelas}`});
+            }
+          }
         } else {
-          for(let i=0;i<12;i++){const due=addMonths(p.from,i);rows.push({id:uid(),client:form.name,value:val,status:"Pendente",due,paid:"",description:`Mensalidade ${new Date(due+"T12:00:00").toLocaleDateString("pt-BR",{month:"short",year:"numeric"})}`});}
+          for(let i=0;i<12;i++){
+            const due=addMonths(p.from,i);
+            rows.push({id:uid(),client:form.name,value:val,status:"Pendente",due,paid:"",description:`Mensalidade ${new Date(due+"T12:00:00").toLocaleDateString("pt-BR",{month:"short",year:"numeric"})}`});
+            // Calculate commission for this month
+            if(form.comissao_percentual&&Number(form.comissao_percentual)>0){
+              const comValue=val*Number(form.comissao_percentual)/100;
+              comRows.push({id:uid(),client:form.name,value:comValue,status:"Pendente",due,paid:"",description:`Comissão - ${new Date(due+"T12:00:00").toLocaleDateString("pt-BR",{month:"short",year:"numeric"})}`});
+            }
+          }
         }
       });
       if(rows.length){await supabase.from("nd_rec").insert(rows);setRec(p=>[...p,...rows]);}
-      // Calculate and add commission
-      if(form.comissao_percentual&&Number(form.comissao_percentual)>0){
-        const comTotal=rows.reduce((a,r)=>a+r.value,0)*Number(form.comissao_percentual)/100;
-        const comDesc=form.comissao_tipo==="parcela"?"Comissão (Parcela única)":"Comissão (Recorrente)";
-        const comRow={id:uid(),client:form.name,value:comTotal,status:"Pendente",due:form.contract_start,paid:"",description:comDesc};
-        await supabase.from("nd_pay").insert(comRow);
-        setPay(p=>[...p,comRow]);
-      }
+      if(comRows.length){await supabase.from("nd_pay").insert(comRows);setPay(p=>[...p,...comRows]);}
     } else {
       await supabase.from("nd_clients").update(obj).eq("id",obj.id);
       setClients(p=>p.map(c=>c.id===obj.id?obj:c));
