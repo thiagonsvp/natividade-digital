@@ -820,6 +820,26 @@ export default function App(){
         td,th{padding:8px 10px !important;}
         div{font-size:13px !important;}
       }
+      @media(max-width:600px){
+        h1{font-size:18px !important;}
+        h2{font-size:16px !important;}
+        h3{font-size:13px !important;}
+        button{font-size:11px !important;padding:5px 10px !important;}
+        input,select,textarea{font-size:12px !important;padding:6px 8px !important;}
+        table{font-size:11px !important;}
+        td,th{padding:6px 8px !important;}
+        span{font-size:11px !important;}
+      }
+      @media(max-width:480px){
+        h1{font-size:16px !important;}
+        h2{font-size:14px !important;}
+        h3{font-size:12px !important;}
+        button{font-size:10px !important;padding:4px 8px !important;margin:2px !important;}
+        input,select,textarea{font-size:11px !important;padding:5px 6px !important;}
+        table{font-size:10px !important;}
+        td,th{padding:4px 6px !important;}
+        div[class="page"]{padding:10px !important;}
+      }
     `}</style>
     <div style={{display:"flex",height:"100vh",width:"100vw",overflow:"hidden",background:C.bg,color:C.text}}>
       <div style={{width:sidebarOpen?220:0,minWidth:0,background:C.sidebar,borderRight:`1px solid ${C.sidebarBorder}`,display:"flex",flexDirection:"column",height:"100vh",transition:"width .2s",overflow:"hidden"}}>
@@ -851,7 +871,7 @@ export default function App(){
         <div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 20px",borderBottom:`1px solid ${C.border}`,background:C.surface}}>
           <button onClick={()=>setSidebarOpen(s=>!s)} style={{background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:18}}>☰</button>
         </div>
-        <div style={{flex:1,overflowY:"auto",padding:"28px max(20px, calc((100vw - 1200px) / 2))",minWidth:0}}>
+        <div style={{flex:1,overflowY:"auto",padding:"clamp(12px, 2vw, 28px) clamp(12px, 4vw, 36px)",minWidth:0}}>
         <div className="page" key={active}>{pages[active]}</div>
       </div>
       </div>
