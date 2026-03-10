@@ -213,13 +213,16 @@ function Dashboard({clients,tasks,history,rec,pay,C}){
 }
 
 // ── Clientes ─────────────────────────────────────────────
-const EMPTY_C=()=>({name:"",plan:"",status:"Ativo",since:"",contract_start:"",contract_end:"",value_schedule:[{from:"",value:"",tipo:"recorrente",parcelas:""}],recurring_day:"",tags:[],contact:"",phone:"",tagsStr:""});
-function Clientes({clients,setClients,history,plans,setPlans,setRec,C}){
+const EMPTY_C=()=>({name:"",plan:"",status:"Ativo",since:"",contract_start:"",contract_end:"",value_schedule:[{from:"",value:"",tipo:"recorrente",parcelas:""}],recurring_day:"",comissao_percentual:"",comissao_tipo:"parcela",tags:[],contact:"",phone:"",tagsStr:""});
+function Clientes({clients,setClients,history,plans,setPlans,setRec,setPay,pay,rec,C}){
   const [sel,setSel]=useState(null);
   const [modal,setModal]=useState(null);
   const [planEd,setPlanEd]=useState(false);
   const [search,setSearch]=useState("");
   const [confirm,setConfirm]=useState(null);
+  const [cancelModal,setCancelModal]=useState(null);
+  const [cancelReason,setCancelReason]=useState("");
+  const [cancelDate,setCancelDate]=useState("");
   const [form,setForm]=useState(EMPTY_C());
   const ff=v=>setForm(p=>({...p,...v}));
   const updVS=(i,fk,v)=>ff({value_schedule:form.value_schedule.map((p,j)=>j===i?{...p,[fk]:v}:p)});
@@ -230,7 +233,7 @@ function Clientes({clients,setClients,history,plans,setPlans,setRec,C}){
   async function save(){
     const tags=form.tagsStr?form.tagsStr.split(",").map(t=>t.trim()).filter(Boolean):[];
     const vs=form.value_schedule.filter(p=>p.from&&p.value);
-    const obj={id:modal==="new"?uid():form.id,name:form.name,plan:form.plan,status:form.status,since:form.since,contract_start:form.contract_start,contract_end:form.contract_end,value_schedule:vs,recurring_day:form.recurring_day,tags,contact:form.contact,phone:form.phone};
+    const obj={id:modal==="new"?uid():form.id,name:form.name,plan:form.plan,status:form.status,since:form.since,contract_start:form.contract_start,contract_end:form.contract_end,value_schedule:vs,recurring_day:form.recurring_day,comissao_percentual:form.comissao_percentual,comissao_tipo:form.comissao_tipo,tags,contact:form.contact,phone:form.phone};
     if(modal==="new"){
       await supabase.from("nd_clients").insert(obj);
       setClients(p=>[...p,obj]);
@@ -244,6 +247,14 @@ function Clientes({clients,setClients,history,plans,setPlans,setRec,C}){
         }
       });
       if(rows.length){await supabase.from("nd_rec").insert(rows);setRec(p=>[...p,...rows]);}
+      // Calculate and add commission
+      if(form.comissao_percentual&&Number(form.comissao_percentual)>0){
+        const comTotal=rows.reduce((a,r)=>a+r.value,0)*Number(form.comissao_percentual)/100;
+        const comDesc=form.comissao_tipo==="parcela"?"Comissão (Parcela única)":"Comissão (Recorrente)";
+        const comRow={id:uid(),client:form.name,value:comTotal,status:"Pendente",due:form.contract_start,paid:"",description:comDesc};
+        await supabase.from("nd_pay").insert(comRow);
+        setPay(p=>[...p,comRow]);
+      }
     } else {
       await supabase.from("nd_clients").update(obj).eq("id",obj.id);
       setClients(p=>p.map(c=>c.id===obj.id?obj:c));
@@ -256,6 +267,25 @@ function Clientes({clients,setClients,history,plans,setPlans,setRec,C}){
     await supabase.from("nd_clients").delete().eq("id",id);
     setClients(p=>p.filter(c=>c.id!==id));
     setSel(null);setConfirm(null);
+  }
+
+  async function cancelContract(){
+    if(!cancelDate||!sel) return;
+    // Update client status
+    await supabase.from("nd_clients").update({status:"Cancelado"}).eq("id",sel.id);
+    setClients(p=>p.map(c=>c.id===sel.id?{...c,status:"Cancelado"}:c));
+    // Cancel all pending receivables after cancel date
+    const futureRecs=rec.filter(r=>r.client===sel.name&&r.status==="Pendente"&&r.due>=cancelDate);
+    for(const r of futureRecs){
+      await supabase.from("nd_rec").update({status:"Cancelado"}).eq("id",r.id);
+    }
+    setRec(p=>p.map(r=>futureRecs.some(fr=>fr.id===r.id)?{...r,status:"Cancelado"}:r));
+    // Add cancellation history
+    const histEntry={id:uid(),client:sel.name,type:"Cancelamento",note:`Motivo: ${cancelReason}. Data: ${fmt(cancelDate)}`,date:today(),user_name:""};
+    setSel({...sel,status:"Cancelado"});
+    setCancelModal(null);
+    setCancelReason("");
+    setCancelDate("");
   }
 
   const list=clients.filter(c=>c.name.toLowerCase().includes(search.toLowerCase()));
@@ -277,7 +307,7 @@ function Clientes({clients,setClients,history,plans,setPlans,setRec,C}){
             <div key={k} style={{background:C.bg,borderRadius:9,padding:"10px 13px"}}><div style={{fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:.7,marginBottom:2}}>{k}</div><div style={{fontSize:13,fontWeight:500,color:C.strong}}>{v||"—"}</div></div>
           )}
         </div>
-        <div style={{marginTop:14}}><Btn C={C} sm ghost danger onClick={()=>setConfirm(sel.id)}>🗑 Excluir</Btn></div>
+        <div style={{marginTop:14,display:"flex",gap:8}}><Btn C={C} sm ghost onClick={()=>setCancelModal(true)} disabled={sel.status==="Cancelado"}>❌ Cancelar Contrato</Btn><Btn C={C} sm ghost danger onClick={()=>setConfirm(sel.id)}>🗑 Excluir</Btn></div>
       </div>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:22,boxShadow:C.shadow}}>
         <h3 style={{fontFamily:"Poppins",fontWeight:700,marginBottom:14,color:C.strong,fontSize:14}}>Histórico</h3>
@@ -289,6 +319,14 @@ function Clientes({clients,setClients,history,plans,setPlans,setRec,C}){
       </div>
     </div>
     {modal&&<ClienteFormModal C={C} form={form} ff={ff} updVS={updVS} plans={plans} modal={modal} onClose={()=>setModal(null)} onSave={save}/>}
+    {cancelModal&&<Modal C={C} title="Cancelar Contrato" onClose={()=>setCancelModal(false)}>
+      <FRow C={C} label="Data de Efetivação"><Inp C={C} type="date" value={cancelDate} onChange={v=>setCancelDate(v)}/></FRow>
+      <FRow C={C} label="Motivo do Cancelamento"><textarea value={cancelReason} onChange={e=>setCancelReason(e.target.value)} placeholder="Motivo..." style={{...iS(C),minHeight:80,fontFamily:"Inter,sans-serif",resize:"vertical"}}/></FRow>
+      <div style={{background:C.bg,borderRadius:10,border:`1px solid ${C.border}`,padding:12,marginBottom:14,fontSize:12,color:C.muted}}>
+        ⚠️ Todas as cobranças com vencimento após a data selecionada serão canceladas automaticamente.
+      </div>
+      <MFoot C={C} onClose={()=>setCancelModal(false)} onSave={cancelContract} disabled={!cancelDate} label="Confirmar Cancelamento"/>
+    </Modal>}
     {confirm&&<Confirm C={C} msg="Deseja realmente excluir este cliente?" onNo={()=>setConfirm(null)} onYes={()=>del(confirm)}/>}
   </div>;
 
@@ -324,6 +362,8 @@ function ClienteFormModal({C,form,ff,updVS,plans,modal,onClose,onSave}){
       <FRow C={C} label="Tags (vírgula)"><Inp C={C} value={form.tagsStr} onChange={v=>ff({tagsStr:v})} placeholder="Saúde, Meta Ads"/></FRow>
       <FRow C={C} label="E-mail"><Inp C={C} value={form.contact} onChange={v=>ff({contact:v})} placeholder="email@empresa.com"/></FRow>
       <div style={{gridColumn:"span 2"}}><FRow C={C} label="Telefone"><Inp C={C} value={form.phone} onChange={v=>ff({phone:v})} placeholder="(11) 99999-0000"/></FRow></div>
+      <FRow C={C} label="Comissão (%)"><Inp C={C} type="number" value={form.comissao_percentual} onChange={v=>ff({comissao_percentual:v})} placeholder="0" min="0" step="0.1"/></FRow>
+      <FRow C={C} label="Tipo"><Sel C={C} value={form.comissao_tipo} onChange={v=>ff({comissao_tipo:v})} options={["parcela","recorrente"]}/></FRow>
     </div>
     <div style={{margin:"8px 0",padding:12,background:C.bg,borderRadius:10,border:`1px solid ${C.border}`}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
@@ -806,7 +846,7 @@ export default function App(){
 
   const pages={
     Dashboard:<Dashboard C={C} clients={clients} tasks={tasks} history={history} rec={rec} pay={pay}/>,
-    Clientes:<Clientes C={C} clients={clients} setClients={setClients} history={history} plans={plans} setPlans={setPlans} setRec={setRec}/>,
+    Clientes:<Clientes C={C} clients={clients} setClients={setClients} history={history} plans={plans} setPlans={setPlans} setRec={setRec} setPay={setPay} pay={pay} rec={rec}/>,
     Funil:<Funil C={C} kanban={kanban} setKanban={setKanban} stages={stages} setStages={setStages}/>,
     Atendimentos:<Atendimentos C={C} history={history} setHistory={setHistory} clients={clients} attTypes={attTypes} setAttTypes={setAttTypes}/>,
     Tarefas:<Tarefas C={C} tasks={tasks} setTasks={setTasks} clients={clients}/>,
